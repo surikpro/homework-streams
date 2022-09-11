@@ -1,10 +1,8 @@
-package task2;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Task2Main {
+public class Task2 {
 
     private final static int SUM_VALUE = 10;
 

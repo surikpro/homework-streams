@@ -1,10 +1,8 @@
-package task1;
-
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Task1Main {
+public class Task1 {
     public static void main(String[] args) {
         System.out.println("Raw data:");
         System.out.println(Arrays.toString(RAW_DATA));
@@ -13,28 +11,29 @@ public class Task1Main {
 //            System.out.println(person.id + " - " + person.name);
 //        }
 
-        System.out.println("**************************************************");
-        System.out.println("Duplicate filtered, sorted by id:");
+        System.out.println("Duplicate filtered:");
         List<Person> list = Arrays.stream(RAW_DATA)
-                .distinct()
-                .sorted(Comparator.comparingInt(Person::getId))
-                .collect(Collectors.toList());
-        System.out.println(list);
+                .filter(Objects::nonNull)
+                .distinct().toList();
+        list.forEach(System.out::println);
+        System.out.println("Duplicate filtered, sorted by id:");
+        List<Person> sortedById = list.stream().sorted(Comparator.comparingInt(Person::getId)).toList();
+        sortedById.forEach(System.out::println);
+        List<Person> sortedByName = sortedById.stream().sorted(Comparator.comparing(Person::getName)).toList();
+        System.out.println("Duplicate filtered, sorted by name and id:");
+        sortedByName.forEach(System.out::println);
         System.out.println("**************************************************");
-        System.out.println("Duplicate filtered, sorted by id and name:");
-        List<Person> sortedByIdAndNameList = list.stream().sorted(Comparator.comparing(Person::getName)).collect(Collectors.toList());
-        System.out.println(sortedByIdAndNameList);
-        System.out.println("**************************************************");
-        System.out.println("Duplicate filtered, sorted by id, name and grouped by name:");
-        Map<String, Long> unOrderedMap = sortedByIdAndNameList.stream()
+        System.out.println("Grouped by name:");
+        sortedByName.stream()
                 .map(Person::getName)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-
-        Map<String, Long> orderedMap = new TreeMap<>(unOrderedMap);
-        for (Map.Entry<String, Long> entry : orderedMap.entrySet()) {
-            System.out.println("Key: " + entry.getKey());
-            System.out.println("Value: " + entry.getValue());
-        }
+                .sorted()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> {
+                    System.out.println(entry.getKey() + ": " + entry.getValue());
+                });
     }
 
     static class Person {
@@ -74,6 +73,7 @@ public class Task1Main {
         public int hashCode() {
             return Objects.hash(getId(), getName());
         }
+
     }
 
     private static Person[] RAW_DATA = new Person[]{
